@@ -1,4 +1,3 @@
 - Implement collision
 - Implement Simple Level generator
 - Figure out what the secrets part is
-- Iplement ASTAR
