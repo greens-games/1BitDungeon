@@ -5,9 +5,12 @@ import "core:fmt"
 import "core:testing"
 
 World :: struct {
-	grid: [2][2]Cell,
+	grid: [32][32]Cell,
 }
 
+//static var here
+//We initialize outside of procedure so this world file contains the same world all over
+world := init()
 
 init :: proc() -> ^World {
 	world := new(World)
@@ -18,7 +21,7 @@ init :: proc() -> ^World {
 			new_cell.col_x = i32(c * utils.CELL_SIZE)
 			new_cell.row_y = i32(r * utils.CELL_SIZE)
 			new_cell.cell_type = .FREE
-			fmt.println(rawptr(new_cell))
+			//			fmt.println(rawptr(new_cell))
 		}
 	}
 	world.grid[0][1].cell_type = .WALL
@@ -26,8 +29,9 @@ init :: proc() -> ^World {
 }
 
 clean_up :: proc(world: ^World) {
-	//	free_all() //THIS WORKS BUT IS ONLY IDEAL IF THIS IS THE LAST THING WE ARE CLEANING UP
+	free_all() //THIS WORKS BUT IS ONLY IDEAL IF THIS IS THE LAST THING WE ARE CLEANING UP
 
+	/* This results in alot of bad frees
 	for data, r in world.grid {
 		for &value, c in world.grid[r] {
 			fmt.println("Freeing address: ", rawptr(&value))
@@ -35,6 +39,34 @@ clean_up :: proc(world: ^World) {
 		}
 	}
 	free(world)
+	*/
+}
+
+valid_cell :: proc(
+	curr_pos: utils.Vector2,
+	next_pos: utils.Vector2,
+	movement: utils.Vector2,
+) -> bool {
+	if (int(next_pos.y) > len(world.grid) - 1 || int(next_pos.x) > len(world.grid[0]) - 1) ||
+	   (next_pos.x < 0 || next_pos.y < 0) {
+		return false
+	}
+
+	//Check for non-walkable terrain
+	if world.grid[int(next_pos.y)][int(next_pos.x)].cell_type == .WALL {
+		return false
+	}
+
+	//Diagonal movement check for adjacent terrain
+	/*
+	if movement.y != 0 && movement.x != 0 {
+		if world.grid[int(curr_pos.y + movement.y)][int(curr_pos.x)].cell_type == .WALL &&
+		   world.grid[int(curr_pos.y)][int(curr_pos.x + movement.x)].cell_type == .WALL {
+			return false
+		}
+	}
+	*/
+	return true
 }
 
 @(test)
