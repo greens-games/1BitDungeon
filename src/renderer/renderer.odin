@@ -61,11 +61,12 @@ draw_battle_map :: proc() {
 
 draw_move_range :: proc(unit: entities.Player_Unit) {
 	//Take our starting position which is in array indices
-	//
-
 	for r in 0 ..= unit.move_range {
 		for c in 0 ..= unit.move_range {
 			if r + c <= unit.move_range {
+				if r == 0 && c == 0  {
+					continue
+				}
 				if r == 0 || c == 0 {
 					draw_horiz_vert_move(r, c, unit)
 				} else {
@@ -74,18 +75,27 @@ draw_move_range :: proc(unit: entities.Player_Unit) {
 			}
 		}
 	}
-	rec := rl.Rectangle {
-		f32((unit.pos_x + 1) * utils.CELL_SIZE),
-		f32(unit.pos_y * utils.CELL_SIZE),
-		utils.CELL_SIZE,
-		utils.CELL_SIZE,
-	}
-	rl.DrawRectangleLinesEx(rec, 1.0, rl.WHITE)
 }
 
 @(private)
 draw_horiz_vert_move :: proc(r, c: i16, unit: entities.Player_Unit) {
 
+	rec := rl.Rectangle {
+		f32((unit.pos_x + r) * utils.CELL_SIZE),
+		f32((unit.pos_y + c) * utils.CELL_SIZE),
+		utils.CELL_SIZE,
+		utils.CELL_SIZE,
+	}
+
+	rec2 := rl.Rectangle {
+		f32((unit.pos_x + -r) * utils.CELL_SIZE),
+		f32((unit.pos_y + -c) * utils.CELL_SIZE),
+		utils.CELL_SIZE,
+		utils.CELL_SIZE,
+	}
+
+	rl.DrawRectangleLinesEx(rec, 1.0, rl.WHITE)
+	rl.DrawRectangleLinesEx(rec2, 1.0, rl.WHITE)
 }
 
 @(private)
@@ -99,15 +109,15 @@ draw_four_move_corners :: proc(r, c: i16, unit: entities.Player_Unit) {
 	}
 
 	rec2 := rl.Rectangle {
-		f32((unit.pos_x + r) * utils.CELL_SIZE),
+		f32((unit.pos_x + -r) * utils.CELL_SIZE),
 		f32((unit.pos_y + c) * utils.CELL_SIZE),
 		utils.CELL_SIZE,
 		utils.CELL_SIZE,
 	}
 
 	rec3 := rl.Rectangle {
-		f32((unit.pos_x + r) * utils.CELL_SIZE),
-		f32((unit.pos_y + c) * utils.CELL_SIZE),
+		f32((unit.pos_x + -r) * utils.CELL_SIZE),
+		f32((unit.pos_y + -c) * utils.CELL_SIZE),
 		utils.CELL_SIZE,
 		utils.CELL_SIZE,
 	}
@@ -115,9 +125,12 @@ draw_four_move_corners :: proc(r, c: i16, unit: entities.Player_Unit) {
 
 	rec4 := rl.Rectangle {
 		f32((unit.pos_x + r) * utils.CELL_SIZE),
-		f32((unit.pos_y + c) * utils.CELL_SIZE),
+		f32((unit.pos_y + -c) * utils.CELL_SIZE),
 		utils.CELL_SIZE,
 		utils.CELL_SIZE,
 	}
 	rl.DrawRectangleLinesEx(rec, 1.0, rl.WHITE)
+	rl.DrawRectangleLinesEx(rec2, 1.0, rl.WHITE)
+	rl.DrawRectangleLinesEx(rec3, 1.0, rl.WHITE)
+	rl.DrawRectangleLinesEx(rec4, 1.0, rl.WHITE)
 }
