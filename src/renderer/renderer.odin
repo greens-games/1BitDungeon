@@ -1,22 +1,123 @@
 package renderer
 
+import "../debug"
+import "../entities"
+import "../utils"
 import "../world"
+import "core:fmt"
 import rl "vendor:raylib"
 
-draw_filled_plane :: proc(player: world.Player) {
-
-	rl.DrawRectangle(0, 0, 16, 16, rl.WHITE)
-
+draw_player_unit_texture :: proc(unit: entities.Player_Unit) {
 	srcRec := rl.Rectangle{0, 0, 16, 16}
-	desRec := rl.Rectangle{player.pos.x, player.pos.y, 16, 16}
-	rl.DrawTexturePro(player.sprite_filled, srcRec, desRec, rl.Vector2{0, 0}, 0.0, rl.WHITE)
+	desRec := rl.Rectangle {
+		f32(unit.pos_x * utils.CELL_SIZE),
+		f32(unit.pos_y * utils.CELL_SIZE),
+		16,
+		16,
+	}
+	rl.DrawTexturePro(unit.sprite_filled, srcRec, desRec, rl.Vector2{0, 0}, 0.0, rl.WHITE)
 }
 
-draw_outlined_plane :: proc(player: world.Player) {
+draw_grid :: proc() {
+	grid_cols := rl.GetScreenWidth() / utils.CELL_SIZE
+	grid_rows := rl.GetScreenHeight() / utils.CELL_SIZE
+	for r in 0 ..< grid_rows {
+		for c in 0 ..< grid_cols {
 
-	rl.DrawRectangle(10, 10, 16, 16, rl.WHITE)
+			rec := rl.Rectangle {
+				f32(c * utils.CELL_SIZE),
+				f32(r * utils.CELL_SIZE),
+				utils.CELL_SIZE,
+				utils.CELL_SIZE,
+			}
+			rl.DrawRectangleLinesEx(rec, 0.15, rl.WHITE)
+		}
+	}
+}
 
-	srcRec := rl.Rectangle{0, 0, 16, 16}
-	desRec := rl.Rectangle{player.pos.x, player.pos.y, 16, 16}
-	rl.DrawTexturePro(player.sprite_outline, srcRec, desRec, rl.Vector2{0, 0}, 0.0, rl.WHITE)
+//Draw the battle map based on the world's Grid
+draw_battle_map :: proc() {
+	for row, r in world.grid {
+		for cell, c in row {
+			#partial switch cell.cell_type {
+			case .WALL:
+				{
+					rl.DrawRectangle(
+						i32(c * utils.CELL_SIZE),
+						i32(r * utils.CELL_SIZE),
+						utils.CELL_SIZE,
+						utils.CELL_SIZE,
+						rl.WHITE,
+					)
+				}
+			case .PLAYER_UNIT:
+				{
+					draw_player_unit_texture(world.player_units[cell.occupier_index])
+				}
+			}
+		}
+	}
+}
+
+draw_move_range :: proc(unit: entities.Player_Unit) {
+	//Take our starting position which is in array indices
+	//
+
+	for r in 0 ..= unit.move_range {
+		for c in 0 ..= unit.move_range {
+			if r + c <= unit.move_range {
+				if r == 0 || c == 0 {
+					draw_horiz_vert_move(r, c, unit)
+				} else {
+					draw_four_move_corners(r, c, unit)
+				}
+			}
+		}
+	}
+	rec := rl.Rectangle {
+		f32((unit.pos_x + 1) * utils.CELL_SIZE),
+		f32(unit.pos_y * utils.CELL_SIZE),
+		utils.CELL_SIZE,
+		utils.CELL_SIZE,
+	}
+	rl.DrawRectangleLinesEx(rec, 1.0, rl.WHITE)
+}
+
+@(private)
+draw_horiz_vert_move :: proc(r, c: i16, unit: entities.Player_Unit) {
+
+}
+
+@(private)
+draw_four_move_corners :: proc(r, c: i16, unit: entities.Player_Unit) {
+
+	rec := rl.Rectangle {
+		f32((unit.pos_x + r) * utils.CELL_SIZE),
+		f32((unit.pos_y + c) * utils.CELL_SIZE),
+		utils.CELL_SIZE,
+		utils.CELL_SIZE,
+	}
+
+	rec2 := rl.Rectangle {
+		f32((unit.pos_x + r) * utils.CELL_SIZE),
+		f32((unit.pos_y + c) * utils.CELL_SIZE),
+		utils.CELL_SIZE,
+		utils.CELL_SIZE,
+	}
+
+	rec3 := rl.Rectangle {
+		f32((unit.pos_x + r) * utils.CELL_SIZE),
+		f32((unit.pos_y + c) * utils.CELL_SIZE),
+		utils.CELL_SIZE,
+		utils.CELL_SIZE,
+	}
+
+
+	rec4 := rl.Rectangle {
+		f32((unit.pos_x + r) * utils.CELL_SIZE),
+		f32((unit.pos_y + c) * utils.CELL_SIZE),
+		utils.CELL_SIZE,
+		utils.CELL_SIZE,
+	}
+	rl.DrawRectangleLinesEx(rec, 1.0, rl.WHITE)
 }

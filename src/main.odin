@@ -4,27 +4,26 @@ import "core:fmt"
 import "core:io"
 import rl "vendor:raylib"
 
+import "debug"
 import "input"
 import "renderer"
+import "utils"
 import "world"
 
 
 main :: proc() {
-	rl.InitWindow(800, 450, "raylib [core] example - basic window")
+	rl.InitWindow(640, 640, "raylib [core] example - basic window")
+	flags := rl.ConfigFlags{.VSYNC_HINT}
+	rl.SetConfigFlags(flags)
 	rl.SetTargetFPS(60)
 
-	player := world.Player {
-		rl.Vector2{0, 0},
-		rl.LoadTexture("./res/player_filled.png"),
-		rl.LoadTexture("./res/player_outline.png"),
-		//		rl.LoadTexture("./res/player_filled_transparent.png"),
-		//		rl.LoadTexture("./res/player_outline_transparent.png"),
-	}
-
+	//REMOVE THIS, USE PLAYER_UNIT INSTEAD
+	world.init()
+	defer world.clean_up()
+	fmt.println(world.grid[0][1])
 	phasing := false
 
-
-	camera := rl.Camera2D{rl.Vector2(0), rl.Vector2(0), 0.0, 3.0}
+	camera := rl.Camera2D{rl.Vector2(0), rl.Vector2(0), 0, utils.CAMERA_ZOOM}
 	for !rl.WindowShouldClose() {
 		rl.SwapScreenBuffer()
 		//Game Systems
@@ -35,7 +34,8 @@ main :: proc() {
 
 			//NOTE: This is not part of the tactics thing but more for playing around with other ideas
 			//			input.player_movement_input(&player, &camera)
-
+			input.detect_hover()
+			input.unit_click()
 
 		}
 
@@ -46,11 +46,9 @@ main :: proc() {
 			rl.ClearBackground(rl.BLACK)
 			//TODO: There's someting weird going on with the drawing of my player texture vertical and diagonal
 
-			if phasing {
-				renderer.draw_outlined_plane(player)
-			} else {
-				renderer.draw_filled_plane(player)
-			}
+			renderer.draw_battle_map()
+			renderer.draw_grid()
+			renderer.draw_move_range(world.selected_unit)
 			rl.EndMode2D()
 			rl.EndDrawing()
 		}

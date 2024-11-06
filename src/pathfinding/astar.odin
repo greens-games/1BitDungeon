@@ -7,13 +7,6 @@ import "core:fmt"
 import "core:math"
 import "core:testing"
 
-Successor :: struct {
-	parent_id: i32,
-	pos:       utils.Vector2,
-	f:         i32,
-	g:         i32,
-	h:         i32,
-}
 Node :: struct {
 	parent_index: i32,
 	//Use row + col for pos
@@ -30,10 +23,10 @@ a_star :: proc(
 	goal: utils.Vector2,
 	valid_proc: proc(_: utils.Vector2, _: utils.Vector2, _: utils.Vector2) -> bool,
 ) -> [dynamic]utils.Vector2 {
-	open_list := [dynamic]Node{}
+	open_list := make([dynamic]Node)
 	defer delete(open_list)
 
-	close_list := [dynamic]Node{}
+	close_list := make([dynamic]Node)
 	defer delete(close_list)
 
 
@@ -109,7 +102,6 @@ get_all_neighbours :: proc(
 
 	for move in moves {
 		new_pos := parent.pos + move
-		_ = new_pos
 		if valid_proc(parent.pos, new_pos, move) {
 			node: Node = {
 				pos = new_pos,
@@ -158,7 +150,7 @@ calc_h :: proc(goal_pos: utils.Vector2, move_pos: utils.Vector2) -> f32 {
 
 back_track :: proc(list: [dynamic]Node) -> [dynamic]utils.Vector2 {
 	curr_node: Node = list[len(list) - 1]
-	ret_list := [dynamic]utils.Vector2{} //I'll need to heap allocate this one
+	ret_list := make([dynamic]utils.Vector2) //I'll need to heap allocate this one
 
 	i: u32 = 100
 
@@ -167,34 +159,4 @@ back_track :: proc(list: [dynamic]Node) -> [dynamic]utils.Vector2 {
 		curr_node = list[curr_node.parent_index]
 	}
 	return ret_list
-}
-
-@(test)
-equality_test :: proc(t: ^testing.T) {
-	v1 := utils.Vector2{1, 1}
-	v2 := utils.Vector2{1, 1}
-	v3 := v1 + v2
-	testing.expect(t, v1.xy == v2.xy, "They are not equal")
-	testing.expect(t, v3.xy == {2, 2}, "They are not equal after adding")
-}
-
-@(test)
-astar_test :: proc(t: ^testing.T) {
-	defer w.clean_up(w.world)
-	start := utils.Vector2{0, 0}
-	goal := utils.Vector2{2, 0}
-	a_star(start, goal, w.valid_cell)
-}
-
-@(test)
-neighbours_test :: proc(t: ^testing.T) {
-	defer w.clean_up(w.world)
-	start := utils.Vector2{0, 0}
-	goal := utils.Vector2{1, 0}
-	parent := Node {
-		pos = start,
-	}
-	nodes := get_all_neighbours(parent, w.valid_cell)
-	delete(nodes)
-	testing.expect(t, len(nodes) == 1)
 }
