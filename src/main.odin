@@ -36,7 +36,6 @@ main :: proc() {
 			//			input.player_movement_input(&player, &camera)
 			input.detect_hover()
 			input.unit_click()
-
 		}
 
 		//Render
@@ -48,7 +47,6 @@ main :: proc() {
 
 			renderer.draw_battle_map()
 			renderer.draw_grid()
-			renderer.draw_move_range(world.selected_unit)
 			rl.EndMode2D()
 			rl.EndDrawing()
 		}

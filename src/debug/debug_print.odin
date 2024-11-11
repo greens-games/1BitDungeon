@@ -1,21 +1,23 @@
 package debug
 
-import "../world"
+import "../entities"
 import "core:fmt"
 
-print_battle_map :: proc() {
+print_battle_map :: proc(grid: [10][10]entities.Cell) {
 
-	for row in world.grid {
+	for row in grid {
 		for cell in row {
 			switch cell.cell_type {
-			case .WALL:
+			case entities.Cell_Type.WALL:
 				fmt.print("W")
-			case .FREE:
+			case entities.Cell_Type.FREE:
 				fmt.print("F")
-			case .PLAYER_UNIT:
+			case entities.Cell_Type.PLAYER_UNIT:
 				fmt.print("P")
-			case .ENEMY_UNIT:
+			case entities.Cell_Type.ENEMY_UNIT:
 				fmt.print("E")
+			case entities.Cell_Type.MOVE_CELL:
+				fmt.print("M")
 			}
 		}
 		fmt.println()

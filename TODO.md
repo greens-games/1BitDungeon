@@ -1,3 +1,2 @@
-- Implement collision
+- Moving and Attacking should be overlayed over the map rather than affect the actual map
 - Implement Simple Level generator
-- Figure out what the secrets part is

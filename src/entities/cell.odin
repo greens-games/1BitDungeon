@@ -1,4 +1,4 @@
-package world
+package entities
 
 Cell :: struct {
 	occupier_index: i32,
@@ -12,4 +12,5 @@ Cell_Type :: enum {
 	WALL,
 	PLAYER_UNIT,
 	ENEMY_UNIT,
+	MOVE_CELL,
 }
