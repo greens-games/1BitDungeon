@@ -36,6 +36,7 @@ draw_grid :: proc() {
 }
 
 //Draw the battle map based on the world's Grid
+//TODO: These battle map stuffs suck we should just have a few render buffers taht we iterate through that contains the pos and what to render (i.e texture, color, etc...) 
 draw_battle_map :: proc() {
 	for row, r in world.grid {
 		for cell, c in row {
@@ -54,6 +55,17 @@ draw_battle_map :: proc() {
 				{
 					draw_player_unit_texture(world.player_units[cell.occupier_index])
 				}
+			}
+		}
+	}
+}
+
+
+//Draw the battle map based on the world's Grid
+draw_battle_map_overlay :: proc() {
+	for row, r in world.grid_overlay {
+		for cell, c in row {
+			#partial switch cell.cell_type {
 			case .MOVE_CELL:
 				{
 					draw_move_cell(r, c)
@@ -63,19 +75,17 @@ draw_battle_map :: proc() {
 	}
 }
 
-
 @(private)
 draw_move_cell :: proc(r, c: int) {
-
 	rec := rl.Rectangle {
 		f32(c * utils.CELL_SIZE),
 		f32(r * utils.CELL_SIZE),
 		utils.CELL_SIZE,
 		utils.CELL_SIZE,
 	}
-
 	rl.DrawRectangleLinesEx(rec, 1.0, rl.WHITE)
 }
+
 /*
 
 @(private)

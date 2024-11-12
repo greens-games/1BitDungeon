@@ -36,6 +36,7 @@ main :: proc() {
 			//			input.player_movement_input(&player, &camera)
 			input.detect_hover()
 			input.unit_click()
+			input.move_cell_click()
 		}
 
 		//Render
@@ -46,6 +47,7 @@ main :: proc() {
 			//TODO: There's someting weird going on with the drawing of my player texture vertical and diagonal
 
 			renderer.draw_battle_map()
+			renderer.draw_battle_map_overlay()
 			renderer.draw_grid()
 			rl.EndMode2D()
 			rl.EndDrawing()

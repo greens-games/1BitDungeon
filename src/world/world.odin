@@ -13,6 +13,8 @@ import rl "vendor:raylib"
 rows :: int(40 / utils.CAMERA_ZOOM)
 cols :: int(40 / utils.CAMERA_ZOOM)
 grid := [rows][cols]entities.Cell{} //could probably be a matrix
+grid_overlay := [rows][cols]entities.Cell{} //could probably be a matrix
+overlay_clear := true
 player_units: [3]entities.Player_Unit //We should know max player unit size so don't need dynamic
 selected_unit: entities.Player_Unit
 
@@ -22,6 +24,10 @@ init :: proc() {
 			grid[r][c].col_x = i32(c * utils.CELL_SIZE)
 			grid[r][c].row_y = i32(r * utils.CELL_SIZE)
 			grid[r][c].cell_type = entities.Cell_Type.FREE
+
+			grid_overlay[r][c].col_x = i32(c * utils.CELL_SIZE)
+			grid_overlay[r][c].row_y = i32(r * utils.CELL_SIZE)
+			grid_overlay[r][c].cell_type = entities.Cell_Type.FREE
 		}
 	}
 	grid[3][5].cell_type = entities.Cell_Type.WALL
@@ -55,7 +61,6 @@ clean_up :: proc() {
 
 //Assign the move cells based on the selected unit, if there's no selected unit reset the move cells
 assign_move_cells :: proc() {
-
 	for r in 0 ..= selected_unit.move_range {
 		for c in 0 ..= selected_unit.move_range {
 			if r + c <= selected_unit.move_range {
@@ -66,6 +71,17 @@ assign_move_cells :: proc() {
 			}
 		}
 	}
+	overlay_clear = false
+}
+
+clear_overlay :: proc() {
+	fmt.println("CLEARING")
+	for data, r in grid_overlay {
+		for value, c in grid_overlay[r] {
+			grid_overlay[r][c].cell_type = entities.Cell_Type.FREE
+		}
+	}
+	overlay_clear = true
 }
 
 valid_cell :: proc(
@@ -100,15 +116,10 @@ valid_cell_1param :: proc(next_pos: utils.Vector2) -> bool {
 	   (next_pos.x < 0 || next_pos.y < 0) {
 		return false
 	}
-
-	fmt.println("THAT'S A WALL YO: ", int(next_pos.y), int(next_pos.x))
 	//Check for non-walkable terrain
 	if grid[int(next_pos.y)][int(next_pos.x)].cell_type == .WALL {
-
-		fmt.println("ACTUALLY A WALL")
 		return false
 	}
-
 	//Diagonal movement check for adjacent terrain
 	/*
 	if movement.y != 0 && movement.x != 0 {
@@ -124,18 +135,15 @@ valid_cell_1param :: proc(next_pos: utils.Vector2) -> bool {
 @(private)
 set_corner_move :: proc(r, c: i16, unit: entities.Player_Unit) {
 	if valid_cell_1param(utils.Vector2{f32(unit.pos_x + c), f32(unit.pos_y + r)}) {
-		grid[(unit.pos_x + c)][(unit.pos_y + r)].cell_type = .MOVE_CELL
+		grid_overlay[(unit.pos_y + r)][(unit.pos_x + c)].cell_type = .MOVE_CELL
 	}
-
 	if valid_cell_1param(utils.Vector2{f32(unit.pos_x + c), f32(unit.pos_y + -r)}) {
-		grid[(unit.pos_x + -c)][(unit.pos_y + r)].cell_type = .MOVE_CELL
+		grid_overlay[(unit.pos_y + -r)][(unit.pos_x + c)].cell_type = .MOVE_CELL
 	}
 	if valid_cell_1param(utils.Vector2{f32(unit.pos_x + -c), f32(unit.pos_y + -r)}) {
-		grid[(unit.pos_x + -c)][(unit.pos_y + -r)].cell_type = .MOVE_CELL
+		grid_overlay[(unit.pos_y + -r)][(unit.pos_x + -c)].cell_type = .MOVE_CELL
 	}
 	if valid_cell_1param(utils.Vector2{f32(unit.pos_x + c), f32(unit.pos_y + -r)}) {
-		grid[(unit.pos_x + c)][(unit.pos_y + -r)].cell_type = .MOVE_CELL
+		grid_overlay[(unit.pos_y + r)][(unit.pos_x + -c)].cell_type = .MOVE_CELL
 	}
-	fmt.printfln("CURRENT BATTLE MAP AFTER THIS R,C (%v,%v)", r, c)
-	debug.print_battle_map(grid)
 }
