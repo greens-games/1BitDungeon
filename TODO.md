@@ -1,2 +1,3 @@
-- Moving and Attacking should be overlayed over the map rather than affect the actual map
+- Get some form of combat going
+- Moving works but they unit moves very fast I would want this to move slower and work on a simple tick system
 - Implement Simple Level generator

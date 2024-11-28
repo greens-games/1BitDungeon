@@ -13,4 +13,5 @@ Cell_Type :: enum {
 	PLAYER_UNIT,
 	ENEMY_UNIT,
 	MOVE_CELL,
+	DAMAGE_CELL,
 }

@@ -23,6 +23,8 @@ print_battle_map :: proc(grid: [10][10]entities.Cell) {
 				fmt.print("E ")
 			case entities.Cell_Type.MOVE_CELL:
 				fmt.print("M ")
+			case entities.Cell_Type.DAMAGE_CELL:
+				fmt.print("D ")
 			}
 		}
 		fmt.println()
@@ -45,6 +47,8 @@ print_battle_map_overlay :: proc(grid: [10][10]entities.Cell) {
 				fmt.print("E")
 			case entities.Cell_Type.MOVE_CELL:
 				fmt.print("M")
+			case entities.Cell_Type.DAMAGE_CELL:
+				fmt.print("D ")
 			}
 		}
 		fmt.println()

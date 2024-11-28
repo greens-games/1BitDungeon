@@ -2,7 +2,6 @@ package pathfinding
 
 
 import "../utils"
-import w "../world"
 import "core:fmt"
 import "core:math"
 import "core:testing"
@@ -150,6 +149,7 @@ calc_h :: proc(goal_pos: utils.Vector2, move_pos: utils.Vector2) -> f32 {
 
 back_track :: proc(list: [dynamic]Node) -> [dynamic]utils.Vector2 {
 	curr_node: Node = list[len(list) - 1]
+	//TODO: Probaly use Temp Allocator here
 	ret_list := make([dynamic]utils.Vector2) //I'll need to heap allocate this one
 
 	i: u32 = 100
@@ -158,5 +158,6 @@ back_track :: proc(list: [dynamic]Node) -> [dynamic]utils.Vector2 {
 		append(&ret_list, curr_node.pos)
 		curr_node = list[curr_node.parent_index]
 	}
+
 	return ret_list
 }

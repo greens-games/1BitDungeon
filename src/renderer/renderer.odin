@@ -7,6 +7,7 @@ import "../world"
 import "core:fmt"
 import rl "vendor:raylib"
 
+
 draw_player_unit_texture :: proc(unit: entities.Player_Unit) {
 	srcRec := rl.Rectangle{0, 0, 16, 16}
 	desRec := rl.Rectangle {
@@ -16,6 +17,17 @@ draw_player_unit_texture :: proc(unit: entities.Player_Unit) {
 		16,
 	}
 	rl.DrawTexturePro(unit.sprite_filled, srcRec, desRec, rl.Vector2{0, 0}, 0.0, rl.WHITE)
+}
+
+draw_enemy_unit_texture :: proc(unit: entities.Enemy_Unit) {
+	srcRec := rl.Rectangle{0, 0, 16, 16}
+	desRec := rl.Rectangle {
+		f32(unit.pos_x * utils.CELL_SIZE),
+		f32(unit.pos_y * utils.CELL_SIZE),
+		16,
+		16,
+	}
+	rl.DrawTexturePro(unit.sprite_outline, srcRec, desRec, rl.Vector2{0, 0}, 0.0, rl.WHITE)
 }
 
 draw_grid :: proc() {
@@ -55,6 +67,11 @@ draw_battle_map :: proc() {
 				{
 					draw_player_unit_texture(world.player_units[cell.occupier_index])
 				}
+
+			case .ENEMY_UNIT:
+				{
+					draw_enemy_unit_texture(world.enemy_units[cell.occupier_index])
+				}
 			}
 		}
 	}
@@ -62,13 +79,19 @@ draw_battle_map :: proc() {
 
 
 //Draw the battle map based on the world's Grid
-draw_battle_map_overlay :: proc() {
+//TODO: get rid of all this texture shenanigans
+draw_battle_map_overlay :: proc(texture: rl.Texture2D) {
 	for row, r in world.grid_overlay {
 		for cell, c in row {
 			#partial switch cell.cell_type {
 			case .MOVE_CELL:
 				{
 					draw_move_cell(r, c)
+				}
+
+			case .DAMAGE_CELL:
+				{
+					draw_damage_cell(r, c, texture)
 				}
 			}
 		}
@@ -84,6 +107,12 @@ draw_move_cell :: proc(r, c: int) {
 		utils.CELL_SIZE,
 	}
 	rl.DrawRectangleLinesEx(rec, 1.0, rl.WHITE)
+}
+
+draw_damage_cell :: proc(r, c: int, damage_cell_texture: rl.Texture2D) {
+	srcRec := rl.Rectangle{0, 0, 16, 16}
+	desRec := rl.Rectangle{f32(c * utils.CELL_SIZE), f32(r * utils.CELL_SIZE), 16, 16}
+	rl.DrawTexturePro(damage_cell_texture, srcRec, desRec, rl.Vector2{0, 0}, 0.0, rl.WHITE)
 }
 
 /*
